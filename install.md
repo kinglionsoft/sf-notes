@@ -1,0 +1,77 @@
+# 本地集群
+
+## 集群安全
+
+> 集群安全配置不可更改，除非重建整个集群。
+采用gMSA（组托管服务）配置集群安全。
+
+### gMSA 配置
+
+> gMSA每次改密码是由DC上面的KDS服务管理的，每次通过一个root key id，时间戳以及gMSA的SID通过某个复杂的算法生成一个随机的密码。注意这里的gMSA中的g代表的是group，也是说我们需要分配一个安全组给这个托管账户，安全组里面的所有计算机账户都可以去使用这个托管账户。
+https://docs.microsoft.com/zh-cn/previous-versions/windows/server/jj128431(v=ws.11)
+域控制器上配置gMSA：
+
+#### DC 上创建gMSA
+* 将集群中的主机加入到安全组：SFHosts
+* 设置组托管服务帐户
+
+``` bash
+
+if(!(Get-KdsRootKey)) {
+    Add-KdsRootKey -EffectiveTime ((get-date).addhours(-10))
+}
+
+New-ADServiceAccount gmsa-sf -DNSHostName gmsa-sf.yx.com -PrincipalsAllowedToRetrieveManagedPassword SFHosts -KerberosEncryptionType RC4,AES128,AES256  -ServicePrincipalNames ServiceFabric/gmsa-sf/yx
+
+```
+* 创建用户组SFAdmins，组内用户可以管理Service Fabric
+
+#### 在成员服务器上配置并验证gMSA服务帐户
+> 确保集群中的主机的【Remtoe Registry】服务已启动。
+
+```bash
+Add-WindowsFeature RSAT-AD-PowerShell
+if(!(Test-ADServiceAccount gmsa-sf)) {
+    Install-ADServiceAccount gmsa-sf
+}
+```
+
+## 安装集群
+
+以下操作都在操作机上进行。
+### 准备
+
+* 操作机：
+    - 能够访问集群中所有主机
+    - 登录操作机的用户有集群主机的管理员权限
+    - 不能安装过Service Fabric
+
+* 下载：https://docs.microsoft.com/zh-cn/azure/service-fabric/service-fabric-windows-cluster-windows-security
+    - Microsoft.Azure.ServiceFabric.WindowsServer.xxx.zip
+    - MicrosoftAzureServiceFabric.xxx.cab
+> 配置文件模板和脚本都在 Microsoft.Azure.ServiceFabric.WindowsServer.xxx.zip 中。
+
+### 集群配置
+
+* 使用  ClusterConfig.gMSA.Windows.MultiMachine.JSON 模板，复制到 ClusterConfig.json，修改 nodes 和 security 配置。
+
+* 创建
+
+``` bash
+# 校验配置
+.\TestConfiguration.ps1 -ClusterConfigFilePath .\ClusterConfig.json
+
+# 创建
+.\CreateServiceFabricCluster.ps1 -ClusterConfigFilePath .\ClusterConfig.json -FabricRuntimePackagePath ..\MicrosoftAzureServiceFabric.6.4.637.9590.cab
+
+# 查看
+Get-ServiceFabricNode |Format-Table
+
+# 删除
+.\RemoveServiceFabricCluster.ps1 -ClusterConfigFilePath .\ClusterConfig.json 
+Invoke-Command -ComputerName SF2 -ScriptBlock {Restart-Computer -Force}
+```
+
+* 管理页面
+ http://sfmaster:19080/Explorer
+
