@@ -53,6 +53,10 @@ if(!(Test-ADServiceAccount gmsa-sf)) {
 
 ### 集群配置
 
+* 一个集群有多个NodeType，包括一个主要（Primary）的NodeType和多个非主要（Non-Primary）NodeType。节点归属于NodeType。NodeType 可以描述节点的特性，如：前端节点、OCR节点、物理机带显卡的节点等。
+
+* 服务部署是通过placement constraints限定布放的节点。
+
 * 使用  ClusterConfig.gMSA.Windows.MultiMachine.JSON 模板，复制到 ClusterConfig.json，修改 nodes 和 security 配置。
 
 * 创建

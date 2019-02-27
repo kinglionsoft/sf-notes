@@ -7,7 +7,10 @@
   <ServiceTypes>
     <!-- 这是 ServiceType 的名称。
          UseImplicitHost 特性表示此为来宾可执行服务。  -->
-    <StatelessServiceType ServiceTypeName="GuestHelloType" UseImplicitHost="true" />
+    <StatelessServiceType ServiceTypeName="GuestHelloType" UseImplicitHost="true" >
+      <!-- 指定部署的节点类型 -->
+      <PlacementConstraints>(NodeType==System)</PlacementConstraints>
+    </StatelessServiceType>
   </ServiceTypes>
 
   <!-- 代码包是指服务可执行文件。 -->

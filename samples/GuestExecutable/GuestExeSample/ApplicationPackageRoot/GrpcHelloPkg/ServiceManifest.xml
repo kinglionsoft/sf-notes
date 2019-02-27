@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceManifest Name="GrpcHelloPkg"
+                 Version="1.0.0"
+                 xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ServiceTypes>
+    <!-- 这是 ServiceType 的名称。
+         UseImplicitHost 特性表示此为来宾可执行服务。  -->
+    <StatelessServiceType ServiceTypeName="GrpcHelloType" UseImplicitHost="true" >
+      <!-- 指定部署的节点类型 -->
+      <PlacementConstraints>(NodeName==SFMaster)</PlacementConstraints>
+    </StatelessServiceType>
+  </ServiceTypes>
+
+  <!-- 代码包是指服务可执行文件。 -->
+  <CodePackage Name="Code" Version="1.0.0">
+    <!-- SetupEntryPoint 是一个可选元素，
+         用于指定启动服务的代码前要执行的程序。 -->
+    <!--
+    <SetupEntryPoint>
+      <ExeHost>
+        <Program></Program>
+      </ExeHost>
+    </SetupEntryPoint>
+    -->
+    <EntryPoint>
+      <ExeHost>
+        <Program>GreeterServer.exe</Program>
+        <Arguments></Arguments>
+        <WorkingFolder>Work</WorkingFolder>
+        <!-- 取消评论以将控制台输出(包括 stdout 和 stderr)
+             记录到服务的工作目录之一。 -->
+        <!-- <ConsoleRedirection FileRetentionCount="5" FileMaxSizeInKb="2048"/> -->
+      </ExeHost>
+    </EntryPoint>
+  </CodePackage>
+
+  <!-- 配置包是 PackageRoot 下 Config 目录的内容，它包含服务的一组 
+       可独立更新且固定版本的自定义配置设置。-->
+  <ConfigPackage Name="Config" Version="1.0.0" />
+
+  <Resources>
+    <Endpoints>
+      <!-- 通信侦听器使用此终结点来获取要侦听的端口。
+           请注意，如果你的服务已分区，
+           与位于代码中的各分区的副本共享此端口。-->
+      <Endpoint Name="GrpcHelloTypeEndpoint" Port="9001" Protocol="http"  UriScheme="http"/>
+    </Endpoints>
+  </Resources>
+</ServiceManifest>

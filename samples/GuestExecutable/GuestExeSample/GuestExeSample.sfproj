@@ -29,9 +29,14 @@
     <None Include="Scripts\Deploy-FabricApplication.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\..\farmer\grpc\csharp\helloworld\GreeterServer\bin\Debug\**\*.*">
+      <Link>ApplicationPackageRoot\GrpcHelloPkg\Code\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
     <Content Include="..\Hello\bin\Release\**\*.*">
       <Link>ApplicationPackageRoot\GuestHelloPkg\Code\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="ApplicationPackageRoot\GrpcHelloPkg\Config\Settings.xml" />
+    <Content Include="ApplicationPackageRoot\GrpcHelloPkg\ServiceManifest.xml" />
     <Content Include="ApplicationPackageRoot\GuestHelloPkg\Config\Settings.xml" />
     <Content Include="ApplicationPackageRoot\GuestHelloPkg\ServiceManifest.xml" />
     <Content Include="packages.config" />

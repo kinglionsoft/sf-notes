@@ -6,21 +6,21 @@
         {
             "nodeName": "SF1",
             "iPAddress": "SF1",
-            "nodeTypeRef": "NodeType0",
+            "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r0",
             "upgradeDomain": "UD0"
         },
         {
             "nodeName": "SF2",
             "iPAddress": "SF2",
-            "nodeTypeRef": "NodeType0",
+            "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r1",
             "upgradeDomain": "UD1"
         },
         {
             "nodeName": "SFMaster",
             "iPAddress": "sfmaster",
-            "nodeTypeRef": "NodeType0",
+            "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r2",
             "upgradeDomain": "UD2"
         }
@@ -49,7 +49,7 @@
         },
         "nodeTypes": [
             {
-                "name": "NodeType0",
+                "name": "System",
                 "clientConnectionEndpointPort": "19000",
                 "clusterConnectionEndpointPort": "19001",
                 "leaseDriverEndpointPort": "19002",
@@ -64,7 +64,80 @@
                     "startPort": "49152",
                     "endPort": "65535"
                 },
-                "isPrimary": true
+                "isPrimary": true,
+                "placementProperties": {
+                    "HasOffice": "true"
+                }
+            },
+            {
+                "name": "FrontEnd",
+                "clientConnectionEndpointPort": "19000",
+                "clusterConnectionEndpointPort": "19001",
+                "leaseDriverEndpointPort": "19002",
+                "serviceConnectionEndpointPort": "19003",
+                "httpGatewayEndpointPort": "19080",
+                "reverseProxyEndpointPort": "19081",
+                "applicationPorts": {
+                    "startPort": "20001",
+                    "endPort": "20031"
+                },
+                "ephemeralPorts": {
+                    "startPort": "49152",
+                    "endPort": "65535"
+                },
+                "isPrimary": false,
+                "capacities": {
+                    "ClientConnections": "65536"
+                }
+            },
+            {
+                "name": "OcrEnd",
+                "clientConnectionEndpointPort": "19000",
+                "clusterConnectionEndpointPort": "19001",
+                "leaseDriverEndpointPort": "19002",
+                "serviceConnectionEndpointPort": "19003",
+                "httpGatewayEndpointPort": "19080",
+                "reverseProxyEndpointPort": "19081",
+                "applicationPorts": {
+                    "startPort": "20001",
+                    "endPort": "20031"
+                },
+                "ephemeralPorts": {
+                    "startPort": "49152",
+                    "endPort": "65535"
+                },
+                "isPrimary": false,
+                "capacities": {
+                    "ClientConnections": "65536"
+                },
+                "placementProperties": {
+                    "HasAbbyy": "true",
+                    "HasOffice": "true"
+                }
+            },
+            {
+                "name": "PhysicalEnd",
+                "clientConnectionEndpointPort": "19000",
+                "clusterConnectionEndpointPort": "19001",
+                "leaseDriverEndpointPort": "19002",
+                "serviceConnectionEndpointPort": "19003",
+                "httpGatewayEndpointPort": "19080",
+                "reverseProxyEndpointPort": "19081",
+                "applicationPorts": {
+                    "startPort": "20001",
+                    "endPort": "20031"
+                },
+                "ephemeralPorts": {
+                    "startPort": "49152",
+                    "endPort": "65535"
+                },
+                "isPrimary": false,
+                "capacities": {
+                    "ClientConnections": "65536"
+                },
+                "placementProperties": {
+                    "HasGPU": "true"
+                }
             }
         ],
         "fabricSettings": [

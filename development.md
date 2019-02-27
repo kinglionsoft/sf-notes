@@ -23,8 +23,28 @@ New-ADServiceAccount gmsa-sf-app -DNSHostName gmsa-sf-app.yx.com -PrincipalsAllo
 ### 部署 
 https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-visualstudio-configure-secure-connections
 
+#### 指定节点
 
-### 反向代理
+* 节点属性和放置约束： https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-cluster-resource-manager-cluster-description#placement-constraints-and-node-properties
+
+* ServiceManifest.xml
+
+```xml
+<StatelessServiceType ServiceTypeName="GuestHelloType" UseImplicitHost="true">
+   <PlacementConstraints>(NodeType==NodeType0)</PlacementConstraints>
+</StatelessServiceType>
+
+```
+
+#### 一个节点运行多个实例
+
+* 暂不支持 SingletonPartition 的 StatelessService 在单个节点上运行多个实例：https://github.com/Azure/service-fabric-issues/issues/325
+
+#### VSTS-Agent
+
+* 在使用TFS发布时，VSTS-Agent的服务账户（Windows 服务中设置）需要设置为SFAdmins中的成员。
+
+### HTTP 反向代理
 
 #### 代理后的地址
 
@@ -49,6 +69,44 @@ By default, HTTP based services that return a 404 will actually kind of confuse 
 ```
 X-ServiceFabric : ResourceNotFound
 ```
+
+### TCP 反向代理
+
+内置的反向代理不支持TCP
+
+#### 解决方案一：部署到指定节点，再代理到外网
+
+```xml
+<StatelessServiceType ServiceTypeName="GrpcHelloType" UseImplicitHost="true" >
+    <!-- 指定部署的节点类型 -->
+    <PlacementConstraints>(NodeName==SFMaster)</PlacementConstraints>
+</StatelessServiceType>
+```
+
+### GRPC 反向代理
+
+http 反向代理后，访问 192.168.0.12:19081/GuestExeSample/GrpcHello： Name resolution failure
+
+``` 
+StatusCode=Unavailable, Detail="Name resolution failure"
+
+dns resolution failed (will retry):
+ "created":"@1551168011.207000000","description":"OS Error","file":"T:\src\github\grpc\workspace_csharp_ext_windows_x86\src\core\lib\iomgr\resolve_address_windows.cc","file_line":96,"os_error":"The specified class was not found.\r\n","syscall":"getaddrinfo","target_address":"192.168.0.12:19081/GuestExeSample/GrpcHello","wsa_error":10109}
+```
+
+#### 解决方案一：Nginx
+
+``` 
+server {
+    listen 9001 http2;
+    location / {
+        grpc_pass grpc://192.168.0.12:19081/GuestExeSample/GrpcHello;
+    }
+}
+
+```
+
+### 读取配置
 
 ## Errors
 
