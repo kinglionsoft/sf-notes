@@ -1,28 +1,87 @@
 {
     "name": "Eson",
-    "clusterConfigurationVersion": "1.0.0",
+    "clusterConfigurationVersion": "1.0.1",
     "apiVersion": "10-2017",
     "nodes": [
         {
             "nodeName": "SF1",
-            "iPAddress": "SF1",
+            "iPAddress": "172.16.0.4",
             "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r0",
             "upgradeDomain": "UD0"
         },
         {
             "nodeName": "SF2",
-            "iPAddress": "SF2",
+            "iPAddress": "172.16.0.5",
             "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r1",
             "upgradeDomain": "UD1"
         },
         {
             "nodeName": "SFMaster",
-            "iPAddress": "sfmaster",
+            "iPAddress": "172.16.0.3",
             "nodeTypeRef": "System",
             "faultDomain": "fd:/dc1/r2",
             "upgradeDomain": "UD2"
+        },
+
+        {
+            "nodeName": "CTCT1",
+            "iPAddress": "172.16.0.11",
+            "nodeTypeRef": "Local",
+            "faultDomain": "fd:/dc1/r3",
+            "upgradeDomain": "UD3"
+        },
+        {
+            "nodeName": "CTCT2",
+            "iPAddress": "172.16.0.12",
+            "nodeTypeRef": "Local",
+            "faultDomain": "fd:/dc1/r4",
+            "upgradeDomain": "UD4"
+        },
+        {
+            "nodeName": "CTCT3",
+            "iPAddress": "172.16.0.13",
+            "nodeTypeRef": "Local",
+            "faultDomain": "fd:/dc1/r5",
+            "upgradeDomain": "UD5"
+        },
+        {
+            "nodeName": "CTCT4",
+            "iPAddress": "172.16.0.14",
+            "nodeTypeRef": "Local",
+            "faultDomain": "fd:/dc1/r2",
+            "upgradeDomain": "UD6"
+        },
+        {
+            "nodeName": "CTCT5",
+            "iPAddress": "172.16.0.15",
+            "nodeTypeRef": "Local",
+            "faultDomain": "fd:/dc1/r6",
+            "upgradeDomain": "UD6"
+        },
+       
+        {
+            "nodeName": "VC2",
+            "iPAddress": "172.16.0.17",
+            "nodeTypeRef": "PhysicalEnd",
+            "faultDomain": "fd:/dc1/r8",
+            "upgradeDomain": "UD4"
+        },
+
+        {
+            "nodeName": "CTC",
+            "iPAddress": "172.18.181.177",
+            "nodeTypeRef": "Aliyun",
+            "faultDomain": "fd:/dc2/r1",
+            "upgradeDomain": "UD5"
+        },
+        {
+            "nodeName": "CTC3",
+            "iPAddress": "172.18.181.179",
+            "nodeTypeRef": "Aliyun",
+            "faultDomain": "fd:/dc2/r3",
+            "upgradeDomain": "UD6"
         }
     ],
     "properties": {
@@ -31,7 +90,7 @@
             "metadata":  "Diagnostics data on NAS",
             "dataDeletionAgeInDays": "21",
             "storeType": "FileShare",
-            "connectionstring": "\\\\nas\\Save\\servicefabric"
+            "connectionstring": "\\\\172.16.0.3\\Share"
         },
         "security": {
             "ClusterCredentialType": "Windows",
@@ -66,6 +125,7 @@
                 },
                 "isPrimary": true,
                 "placementProperties": {
+                    "HasAbbyy": "true",
                     "HasOffice": "true"
                 }
             },
@@ -88,6 +148,9 @@
                 "isPrimary": false,
                 "capacities": {
                     "ClientConnections": "65536"
+                },
+                "placementProperties": {
+                    "HasOffice": "true"
                 }
             },
             {
@@ -136,7 +199,61 @@
                     "ClientConnections": "65536"
                 },
                 "placementProperties": {
-                    "HasGPU": "true"
+                    "HasGPU": "true",
+                    "HasAbbyy": "true",
+                    "HasOffice": "true"
+                }
+            },
+            {
+                "name": "Aliyun",
+                "clientConnectionEndpointPort": "19000",
+                "clusterConnectionEndpointPort": "19001",
+                "leaseDriverEndpointPort": "19002",
+                "serviceConnectionEndpointPort": "19003",
+                "httpGatewayEndpointPort": "19080",
+                "reverseProxyEndpointPort": "19081",
+                "applicationPorts": {
+                    "startPort": "20001",
+                    "endPort": "20031"
+                },
+                "ephemeralPorts": {
+                    "startPort": "49152",
+                    "endPort": "65535"
+                },
+                "isPrimary": false,
+                "capacities": {
+                    "ClientConnections": "65536"
+                },
+                "placementProperties": {
+                    "HasGPU": "false",
+                    "HasAbbyy": "true",
+                    "HasOffice": "true"
+                }
+            },
+            {
+                "name": "Local",
+                "clientConnectionEndpointPort": "19000",
+                "clusterConnectionEndpointPort": "19001",
+                "leaseDriverEndpointPort": "19002",
+                "serviceConnectionEndpointPort": "19003",
+                "httpGatewayEndpointPort": "19080",
+                "reverseProxyEndpointPort": "19081",
+                "applicationPorts": {
+                    "startPort": "20001",
+                    "endPort": "20031"
+                },
+                "ephemeralPorts": {
+                    "startPort": "49152",
+                    "endPort": "65535"
+                },
+                "isPrimary": false,
+                "capacities": {
+                    "ClientConnections": "65536"
+                },
+                "placementProperties": {
+                    "Test": "true",
+                    "HasOffice": "true",
+                    "HasAbbyy": "true"
                 }
             }
         ],

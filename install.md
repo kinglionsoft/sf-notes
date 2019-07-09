@@ -66,16 +66,78 @@ if(!(Test-ADServiceAccount gmsa-sf)) {
 .\TestConfiguration.ps1 -ClusterConfigFilePath .\ClusterConfig.json
 
 # 创建
-.\CreateServiceFabricCluster.ps1 -ClusterConfigFilePath .\ClusterConfig.json -FabricRuntimePackagePath ..\MicrosoftAzureServiceFabric.6.4.637.9590.cab
+.\CreateServiceFabricCluster.ps1 -ClusterConfigFilePath .\ClusterConfig.json -FabricRuntimePackagePath ..\MicrosoftAzureServiceFabric.6.5.639.9590.cab
 
 # 查看
 Get-ServiceFabricNode |Format-Table
 
 # 删除
 .\RemoveServiceFabricCluster.ps1 -ClusterConfigFilePath .\ClusterConfig.json 
-Invoke-Command -ComputerName SF2 -ScriptBlock {Restart-Computer -Force}
+
+# 添加节点
+ .\AddNode.ps1 -NodeName CTC -NodeType Aliyun -NodeIPAddressorFQDN 172.18.181.177 -ExistingClientConnectionEndpoint 172.16.0.3:19000 -UpgradeDomain UD5 -FaultDomain fd:/dc2/r1 -FabricRuntimePackagePath ..\MicrosoftAzureServiceFabric.6.4.637.9590.cab -AcceptEULA  -WindowsCredential
+```
+
+* 修改配置
+任意节点中
+
+```bash
+Connect-ServiceFabricCluster
+Get-ServiceFabricClusterConfiguration > 1.0.1.json 
+# 修改1.0.1.json
+Start-ServiceFabricClusterConfigurationUpgrade -ClusterConfigPath 1.0.1.json
 ```
 
 * 管理页面
- http://sfmaster:19080/Explorer
+ http://sf.yx.com:19080/Explorer
 
+
+* 辅助
+
+``` bash
+# Win10 需要安装 https://www.microsoft.com/zh-CN/download/details.aspx?id=45520
+Import-Module ActiveDirectory
+
+$group="CN=SFHosts,CN=Computers,DC=yx,DC=com"
+
+$computers=(Get-ADComputer -Filter 'MemberOf -eq $group')
+
+foreach($c in $computers) {
+    Write-Host $c.Name "starting"
+    Invoke-Command -ComputerName $c.Name -FilePath ./CleanFabric.ps1
+    Invoke-Command -ComputerName $c.Name -ScriptBlock {Remove-Item C:/SF/* -recurse}
+}
+
+# Invoke-Command -ComputerName CTCT5 -ScriptBlock {ipconfig /flushdns}  
+
+# 重启
+Invoke-Command -ComputerName SF2 -ScriptBlock {Remove-Item C:/SF/* -recurse}
+```
+
+* 掉电后节点离线
+
+``` bash
+ Invoke-Command -ComputerName CTC3 -ScriptBlock {Restart-Service FabricHostSvc ; Restart-Service FabricInstallerSvc} 
+```
+
+
+* Node down
+https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-cluster-windows-server-add-remove-nodes#remove-nodes-from-your-cluster
+```bash
+Connect-ServiceFabricCluster -ConnectionEndpoint  sfmaster:19000 -WindowsCredential
+Get-ServiceFabricClusterConfiguration > 17.json
+# 删除 Certificate
+#  "$id": "1",
+#      "CertificateInformation": {
+#       "$id": "2"
+#      },
+Start-ServiceFabricClusterConfigurationUpgrade -ClusterConfigPath 17.json
+Get-ServiceFabricClusterUpgrade
+
+RemoveNode.ps1 -ExistingClientConnectionEndpoint sfmaster:19000
+```
+
+### 本地集群
+
+#### 修改NodeType
+https://stackoverflow.com/questions/37881422/how-do-i-configure-local-cluster-for-addtional-node-types

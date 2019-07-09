@@ -9,7 +9,6 @@
          UseImplicitHost 特性表示此为来宾可执行服务。  -->
     <StatelessServiceType ServiceTypeName="GrpcHelloType" UseImplicitHost="true" >
       <!-- 指定部署的节点类型 -->
-      <PlacementConstraints>(NodeName==SFMaster)</PlacementConstraints>
     </StatelessServiceType>
   </ServiceTypes>
 
